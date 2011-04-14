@@ -1,0 +1,1 @@
+* Crashes when run in root mode after adding getenv() support

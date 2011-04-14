@@ -31,15 +31,16 @@ void init()
 int main(int argc, char **argv)
 {
 	init();
-	char s1[50], s2[50], command[100];
-	gethostname(s1, 50);
-	getcwd(s2, 50);
-	printf("%s@%s:%s$ ", getlogin(), s1, s2);
+	char hostname[50], command[100], CWD[200], CWD_SHORT[100];
+	gethostname(hostname, 50);
+	strcpy(CWD, getenv("PWD"));
+	strcpy(CWD_SHORT, strncpy(strstr(CWD,getenv("HOME")), "~", strlen(getenv("HOME"))));
+	printf("%s@%s:%s$ ", getenv("USER"), hostname, CWD_SHORT);
 	while(gets(command))
 	{
 		if(strcmp(command, "exit")==0)
 			exit(1);
-		printf("%s@%s:%s$ ", getlogin(), s1, s2);
+		printf("%s@%s:%s$ ", getenv("USER"), hostname, CWD_SHORT);
 	}
 	return 0;
 }

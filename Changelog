@@ -1,0 +1,3 @@
+* Added shortening of home path to '~'
+* Uses getenv() instead of POSIX functions
+* Added basic functionality
