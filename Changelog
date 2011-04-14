@@ -1,3 +1,5 @@
+* Created a modular structure for easy additions in future
+* Fixed a crash when run in root
 * Added shortening of home path to '~'
 * Uses getenv() instead of POSIX functions
 * Added basic functionality
