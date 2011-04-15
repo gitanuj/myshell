@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
+#include <termios.h>
 #include <stdlib.h>
 
 #define MAX_USER 32
@@ -59,13 +60,27 @@ void printControl()
 		c = '#';
 	else
 		c = '$';
-	printf("%s@%s:%s%c ", USER, HOSTNAME, getShortCWD(), c);
+	printf("\n%s@%s:%s%c ", USER, HOSTNAME, getShortCWD(), c);
+}
+
+int getch() 
+{
+	struct termios oldt,
+				 newt;
+	int            ch;
+	tcgetattr( STDIN_FILENO, &oldt );
+	newt = oldt;
+	newt.c_lflag &= ~( ICANON | ECHO );
+	tcsetattr( STDIN_FILENO, TCSANOW, &newt );
+	ch = getchar();
+	tcsetattr( STDIN_FILENO, TCSANOW, &oldt );
+	return ch;
 }
 
 int main()
 {
 	char c[MAX_INPUT];
-	int i=0;
+	int i=0, flag=0;
 	
 	//	Print welcome message
 	init();
@@ -82,11 +97,63 @@ int main()
 		printControl();
 		
 		//	Get user input
-		while((c[i]=getchar())!=10)
+		while((c[i] = (char)getch()))
 		{
-			i++;
+			switch(c[i])
+			{
+				case   9 : // Tab pressed
+							break;
+						  
+				case  10 : // Enter pressed
+							c[i] = '\0';
+							flag = 1;
+							break;
+						  
+				case  27 : 
+							c[++i] = (char)getch();
+							if(c[i] == 91)
+							{
+							  c[++i] = (char)getch();
+							  if(c[i] == 65)
+							  {
+								  // Up arrow key pressed
+								  printf("UA");
+							  }
+							  else if(c[i] == 66)
+							  {
+								  // Down arrow key pressed
+								  printf("DA");
+							  }
+							  else if(c[i] == 67)
+							  {
+								  // Right arrow key pressed
+								  printf("RA");
+							  }
+							  else if(c[i] == 68)
+							  {
+								  // Left arrow key pressed
+								  printf("LA");
+							  }
+							  else
+							  {
+								  // Any other special key pressed
+							  }
+							}
+							break;
+						  
+				case 127 : // Backspace
+							break;
+	  
+				default  : // Any other key pressed
+							printf("%c", c[i]);
+							i++;
+			}
+			if(flag)
+			{
+				flag = 0;
+				break;
+			}
 		}
-		c[i] = '\0';
 		
 		// input is 'exit'
 		if(strcmp(c, "exit") == 0)

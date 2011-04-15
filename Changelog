@@ -1,3 +1,8 @@
+16.04.11
+********
++ Added initial support of "termios" library (for custom getch())
++ Added custom getch()
+
 15.04.11
 ********
 + Created a modular structure for easy additions in future
