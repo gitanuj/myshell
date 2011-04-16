@@ -1,3 +1,8 @@
+17.04.11
+********
+- Implement visually correct backspace
+- Improve 'cd'
+
 16.04.11
 ********
 -(Started) Add getch support because getchar is not scalable

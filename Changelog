@@ -1,3 +1,9 @@
+17.04.11
+********
++ Added support for fork() and execvp()
++ Added initial support for 'cd'
++ Improved input mechanism
+
 16.04.11
 ********
 + Added initial support of "termios" library (for custom getch())
