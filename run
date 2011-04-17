@@ -1,3 +1,5 @@
-gcc -c myshell.c
-gcc -o myshell myshell.o
-./myshell
+gcc -c ~/myshell/myshell.c
+gcc -o ~/myshell/myshell ~/myshell/myshell.o
+rm ~/myshell/myshell.o
+~/myshell/myshell
+rm ~/myshell/myshell
