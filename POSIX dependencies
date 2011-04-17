@@ -1,0 +1,21 @@
+POSIX functions used :
+**********************
+1. getenv()
+2. gethostname()
+3. getcwd()
+4. chdir()
+5. execvp()
+6. fork()
+7. kill()
+8. signal()
+9. wait()
+
+POSIX environment variables used :
+**********************************
+1. USER
+2. HOME
+
+POSIX signals used :
+********************
+1. SIGINT
+2. SIGUSR1
