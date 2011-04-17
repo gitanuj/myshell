@@ -1,0 +1,3 @@
+gcc -c myshell.c
+gcc -o myshell myshell.o
+./myshell
