@@ -1,3 +1,11 @@
-	README
-	******
-myshell aims at providing a basic shell based on POSIX functions & POSIX compliant environment variables. It is completely written in C.
+Introduction
+============
+myshell is a simple POSIX compliant shell written in C.
+
+Installation
+============
+Just execute run file in terminal
+
+POSIX dependencies
+==================
+This file lists all the POSIX functions, environment variables and signals used in myshell.
