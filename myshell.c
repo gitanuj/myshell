@@ -1,8 +1,10 @@
 //      myshell.c
+//      A simple POSIX compliant shell
 //      
-//      Copyright 2011
+//      Copyright 2011 Tanuj Mittal <tanuj.183@gmail.com>
+//      Copyright 2011 Sahaj Biyani <sahajbiyani@gmail.com>
 //      
-//      This program is free software; you can redistribute it and/or modify
+//      myshell is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
 //      the Free Software Foundation; either version 2 of the License, or
 //      (at your option) any later version.
@@ -25,6 +27,8 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <errno.h>
+#include <signal.h>
 
 #define MAX_USER 32
 #define MAX_HOSTNAME 64
@@ -96,6 +100,18 @@ int prepareArgs(char *buffer, char *args[MAX_ARGS])
 	return i;
 }
 
+// signal handler for SIGINT
+void catch_int(int sig_num)
+{
+    signal(SIGINT, catch_int);
+}
+
+// signal handler for SIGUSR1
+void catch_usr1(int sig_num)
+{
+    exit(1);
+}
+
 int main()
 {
 	char c[MAX_INPUT];
@@ -107,13 +123,19 @@ int main()
 	//	Print welcome message
 	init();
 	
+	// set SIGINT signal handler
+	signal(SIGINT, catch_int);
+	
+	// set SIGUSR1 signal handler
+	signal(SIGUSR1, catch_usr1);
+	
 	//	Start with endless loop of shell
 	while(1)
 	{
 		// Calculate stuff for control statement
 		strcpy(USER, getenv("USER"));
 		gethostname(HOSTNAME, MAX_HOSTNAME);
-		strcpy(CWD, getenv("PWD"));
+		getcwd(CWD, MAX_CWD);
 		
 		//	Print control statement
 		printControl();
@@ -129,6 +151,10 @@ int main()
 				case  10 : // Enter pressed
 						printf("\n");
 						c[i] = '\0';
+						
+						//	Reset input array
+						i = 0;
+						
 						flag = 1;
 						break;
 						  
@@ -178,6 +204,8 @@ int main()
 						printf("BK");
 						if(i > 0)
 							i--;
+						else
+							i=0;
 						break;
 	  
 				default  : // Any other key pressed
@@ -186,39 +214,35 @@ int main()
 			}
 			if(flag)
 			{
+				// Get out of input loop
 				flag = 0;
 				break;
 			}
 		}
 		
+		// if input is empty
+		if(strlen(c) == 0)
+			continue;
+		
 		// prepare *args[] for execvp()
 		num_of_args = prepareArgs(c, args);
 		
-		if(strcmp(args[0], "exit") == 0)
-		{
-			// input is 'exit'
-			exit(1);
-		}
-		else if(strcmp(args[0], "cd") == 0)
+		if(strcmp(args[0], "cd") == 0)
 		{
 			// input is 'cd'
-			if(strcmp(args[1], "..") == 0)
+			if(chdir(args[1]) != 0)
 			{
-				// Go one directory up
-			}
-			else
-			{
-				// set "PWD" to args[1]
-				setenv("PWD", args[1], 1);
+				perror("myshell: cd");
 			}
 		}
 		else
 		{
+			// fork a child
 			pid = fork();
 			
 			if(pid < 0)
 			{
-				// fork() unsuccessful
+				// fork unsuccessful
 			}
 			else if(pid > 0)
 			{
@@ -227,12 +251,29 @@ int main()
 			}
 			else
 			{
-				// rewriting instruction set with c[]
-				execvp(c, args);
+				// child
+				if(strcmp(args[0], "exit") == 0)
+				{
+					// input is 'exit'
+					printf("exit\n");
+					
+					// send SIGUSR1 signal to parent
+					kill(getppid(), SIGUSR1);
+					
+					exit(0);
+				}
+				else
+				{
+					// rewriting instruction set with c[]
+					if(execvp(c, args) == -1)
+					{
+						printf("myshell: %s: %s\n", args[0], strerror(errno));
+					}
+					exit(0);
+				}
 			}
 		}
-		
-		//	Reset input array
-		i = 0;
 	}
+	
+	return 0;
 }

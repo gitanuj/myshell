@@ -3,6 +3,9 @@
 + Added support for fork() and execvp()
 + Added initial support for 'cd'
 + Improved input mechanism
++ Added chdir()
++ Added SIGINT handles
++ Bugs fixed
 
 16.04.11
 ********

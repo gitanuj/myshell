@@ -1,10 +1,10 @@
 17.04.11
 ********
-- executing commands don't take $PWD into account
+-(Invalid) executing commands don't take $PWD into account
 
 16.04.11
 ********
-- Crashes when run as "sudo ./myshell"
+-(Fixed) Crashes when run as "sudo ./myshell"
 
 15.04.11
 ********
