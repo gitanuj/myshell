@@ -1,3 +1,7 @@
+20.04.11
+********
+- Berserk output when using UA
+
 17.04.11
 ********
 -(Invalid) executing commands don't take $PWD into account

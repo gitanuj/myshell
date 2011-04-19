@@ -1,11 +1,16 @@
+20.04.11
+********
+-(Started) Implement history feature using UA and DA
+- Implement left and right traversal using LA and RA
+
 17.04.11
 ********
-- Implement visually correct backspace
--(Started) Improve 'cd'
+-(Done) Implement visually correct backspace
+-(Done) Improve 'cd'
 -(Done) Implement chdir()
 - '~' in input buffer should expand to "$HOME"
 -(Started) Add basic support for displaying errors
 
 16.04.11
 ********
--(Almost done) Add getch support because getchar is not scalable
+-(Done) Add getch support because getchar is not scalable

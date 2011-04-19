@@ -35,6 +35,7 @@
 #define MAX_CWD 256
 #define MAX_INPUT 1024
 #define MAX_ARGS 10
+#define MAX_HISTORY 100
 
 char USER[MAX_USER], HOSTNAME[MAX_HOSTNAME], CWD[MAX_CWD];
 
@@ -112,13 +113,72 @@ void catch_usr1(int sig_num)
     exit(1);
 }
 
+// add input to history
+void addToHistory(char *c, char *history[MAX_HISTORY], int *n)
+{
+	int flag = 0;
+	
+	if(*n > 0)
+	{
+		if(strcmp(c, history[(*n)-1]) != 0)
+		{
+			flag = 1;
+		}
+	}
+	else
+	{
+		flag = 1;
+	}
+	
+	if(flag)
+	{
+		history[*n] = (char*)malloc(strlen(c));
+		strcpy(history[*n], c);
+		(*n)++;
+	}
+}
+
+void getPreviousHistory(char *history[MAX_HISTORY], int history_count, int *count, int *i, char *c)
+{
+	int j,len,end;
+	
+	if(*count > 0)
+	{
+		if(*count == history_count)
+			end = *i;
+		else
+			end = strlen(history[(*count)]);
+		
+		// get cursor to begining of line
+		for(j=0 ; j < *i ; j++)
+			putchar('\b');
+			
+		for(j=0 ; j < *i ; j++)
+			putchar(' ');
+			
+		for(j=0 ; j < *i ; j++)
+			putchar('\b');
+		
+		// put history line
+		printf("%s", history[(*count)-1]);
+		c = history[(*count)-1];
+		
+		len = strlen(history[(*count)-1]);
+		
+		*i = len;
+		(*count)--;
+	}
+}
+
 int main()
 {
 	char c[MAX_INPUT];
 	int i=0, flag=0;
 	char *args[MAX_ARGS];
+	char *history[MAX_HISTORY];
 	pid_t pid;
 	int num_of_args;
+	int history_count=0, count;
 	
 	//	Print welcome message
 	init();
@@ -139,6 +199,8 @@ int main()
 		
 		//	Print control statement
 		printControl();
+		
+		count = history_count;
 		
 		//	Get user input
 		while((c[i] = (char)getch()))
@@ -166,13 +228,15 @@ int main()
 							if(c[i] == 65)
 							{
 							  // Up arrow key pressed
-							  printf("UA");
+							  //printf("UA");
 							  i-=2;
+							  getPreviousHistory(history, history_count, &count, &i, c);
 							}
 							else if(c[i] == 66)
 							{
 							  // Down arrow key pressed
 							  printf("DA");
+							  //getNextHistory(history, history_count, count, i);
 							  i-=2;
 							}
 							else if(c[i] == 67)
@@ -201,9 +265,13 @@ int main()
 						break;
 						  
 				case 127 : // Backspace
-						printf("BK");
 						if(i > 0)
+						{
+							putchar('\b');
+							putchar(' ');
+							putchar('\b');
 							i--;
+						}
 						else
 							i=0;
 						break;
@@ -223,6 +291,9 @@ int main()
 		// if input is empty
 		if(strlen(c) == 0)
 			continue;
+			
+		// add c to history
+		addToHistory(c, history, &history_count);
 		
 		// prepare *args[] for execvp()
 		num_of_args = prepareArgs(c, args);

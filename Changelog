@@ -1,3 +1,8 @@
+20.04.11
+********
++ Added working backspace functionality
++ Added initial support for history
+
 17.04.11
 ********
 + Added support for fork() and execvp()
