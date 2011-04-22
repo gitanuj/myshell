@@ -1,6 +1,10 @@
+22.04.11
+********
+- Implement pipes mechanism
+
 20.04.11
 ********
--(Started) Implement history feature using UA and DA
+-(Done) Implement history feature using UA and DA
 - Implement left and right traversal using LA and RA
 
 17.04.11
@@ -8,7 +12,7 @@
 -(Done) Implement visually correct backspace
 -(Done) Improve 'cd'
 -(Done) Implement chdir()
-- '~' in input buffer should expand to "$HOME"
+-(Done) '~' in input buffer should expand to "$HOME"
 -(Started) Add basic support for displaying errors
 
 16.04.11

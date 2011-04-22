@@ -1,3 +1,8 @@
+22.04.11
+********
++ Added complete history support using UA & DA
++ Added auto expansion of '~' to $USER in every args[]
+
 20.04.11
 ********
 + Added working backspace functionality

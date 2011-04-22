@@ -85,6 +85,26 @@ int getch()
 	return ch;
 }
 
+void replaceHomeString(char str[])
+{
+	char *ptr = strstr(str, "~");
+	char temp[100];
+	int i=-1,j=0,k=0;
+	char *home = getenv("HOME");
+	if(ptr != NULL)
+	{
+		while(str[++i] != '~')
+			temp[i] = str[i];
+		k = i++;
+		while(home[j] != '\0')
+			temp[k++] = home[j++];
+		while(str[i] != '\0')
+			temp[k++] = str[i++];
+		temp[k] = '\0';
+		strcpy(str, temp);
+	}
+}
+
 int prepareArgs(char *buffer, char *args[MAX_ARGS])
 {
 	char *temp = strtok(buffer, " ");
@@ -97,6 +117,11 @@ int prepareArgs(char *buffer, char *args[MAX_ARGS])
 		i++;
 	}
 	args[i] = NULL;
+	
+	i = 0;
+	// replace ~ by $HOME
+	while(args[i] != NULL)
+		replaceHomeString(args[i++]);
 	
 	return i;
 }
@@ -140,9 +165,9 @@ void addToHistory(char *c, char *history[MAX_HISTORY], int *n)
 
 void getPreviousHistory(char *history[MAX_HISTORY], int history_count, int *count, int *i, char *c)
 {
-	int j,len,end;
+	int j,end;
 	
-	if(*count > 0)
+	if(*count > 0 && *count <= history_count)
 	{
 		if(*count == history_count)
 			end = *i;
@@ -150,23 +175,55 @@ void getPreviousHistory(char *history[MAX_HISTORY], int history_count, int *coun
 			end = strlen(history[(*count)]);
 		
 		// get cursor to begining of line
-		for(j=0 ; j < *i ; j++)
+		for(j=0 ; j < end ; j++)
 			putchar('\b');
 			
-		for(j=0 ; j < *i ; j++)
+		for(j=0 ; j < end ; j++)
 			putchar(' ');
 			
-		for(j=0 ; j < *i ; j++)
+		for(j=0 ; j < end ; j++)
 			putchar('\b');
 		
-		// put history line
-		printf("%s", history[(*count)-1]);
-		c = history[(*count)-1];
-		
-		len = strlen(history[(*count)-1]);
-		
-		*i = len;
 		(*count)--;
+		// put history line
+		printf("%s", history[(*count)]);
+		strcpy(c, history[(*count)]);
+		
+		*i = strlen(history[(*count)]);
+	}
+}
+
+void getNextHistory(char *history[MAX_HISTORY], int history_count, int *count, int *i, char *c)
+{
+	int j,end;
+	
+	if(*count < history_count && *count >= 0)
+	{
+		end = strlen(history[(*count)]);
+	
+		// get cursor to begining of line
+		for(j=0 ; j < end ; j++)
+			putchar('\b');
+			
+		for(j=0 ; j < end ; j++)
+			putchar(' ');
+			
+		for(j=0 ; j < end ; j++)
+			putchar('\b');
+			
+		(*count)++;
+		// put history line
+		if(*count == history_count)
+		{
+			strcpy(c, "");
+			*i = 0;
+		}
+		else
+		{
+			printf("%s", history[(*count)]);
+			strcpy(c, history[(*count)]);
+			*i = strlen(history[(*count)]);
+		}
 	}
 }
 
@@ -200,6 +257,7 @@ int main()
 		//	Print control statement
 		printControl();
 		
+		// position of count tells temporary history cursor
 		count = history_count;
 		
 		//	Get user input
@@ -228,16 +286,14 @@ int main()
 							if(c[i] == 65)
 							{
 							  // Up arrow key pressed
-							  //printf("UA");
 							  i-=2;
 							  getPreviousHistory(history, history_count, &count, &i, c);
 							}
 							else if(c[i] == 66)
 							{
 							  // Down arrow key pressed
-							  printf("DA");
-							  //getNextHistory(history, history_count, count, i);
 							  i-=2;
+							  getNextHistory(history, history_count, &count, &i, c);
 							}
 							else if(c[i] == 67)
 							{
